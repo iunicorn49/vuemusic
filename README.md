@@ -1,21 +1,19 @@
 # vue-music
 
-> 音乐播放器
+## 依赖
 
-## Build Setup
+### -S
 
-``` bash
-# install dependencies
-npm install
+####babel-runtime
 
-# serve with hot reload at localhost:8080
-npm run dev
+对 ES 语法进行转译
 
-# build for production with minification
-npm run build
+####fastclick
 
-# build for production and view the bundle analyzer report
-npm run build --report
-```
+解决移动端 300ms 延迟
 
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+### -D
+
+#### bable-polyfill
+
+对 ES6 的API 进行转译
