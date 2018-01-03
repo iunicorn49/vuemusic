@@ -23,7 +23,8 @@ module.exports = {
     alias: {
       // 配置路径别名
       '@': resolve('src'),
-      'common': resolve('src/common')
+      'common': resolve('src/common'),
+      'components': resolve('src/components')
     }
   },
   module: {
