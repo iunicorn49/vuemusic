@@ -1,7 +1,7 @@
 import 'babel-polyfill' // 辅助编译 ES6 源码
 import Vue from 'vue'
 import App from './App'
-// import router from './router'
+import router from './router'
 import fastclick from 'fastclick' // 解决移动端 300ms 延迟
 
 import 'common/stylus/index.styl'
@@ -11,5 +11,6 @@ fastclick.attach(document.body)
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  render: h => h(App)
+  render: h => h(App),
+  router
 })
