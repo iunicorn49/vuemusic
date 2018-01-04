@@ -30,5 +30,26 @@ jsonp(url, opts, fn)
 
 opts 是一个对象
 
-- param: 参数
+- param: 函数名
 - timeout: 最长等待时间
+
+
+##开发轮播图组件
+
+###better-scroll
+
+官方文档: https://ustbhuangyi.github.io/better-scroll/doc/zh-hans/
+
+## JavaSCript
+
+### className
+
+> 可以获取目标 DOM 元素的 class , 返回一个字符串, 可以添加 class . 
+
+```javascript
+let box = document.getElementById('box')
+console.log(box.className)
+box.className = 'newClass'
+console.log(box.className)
+```
+
