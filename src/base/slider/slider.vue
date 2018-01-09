@@ -110,6 +110,10 @@
           this.slider.next()
         }, this.interval)
       }
+    },
+    destroyed() {
+      //  当组件被销毁的时候,清掉所有定时器释放内存
+      clearTimeout(this.timer)
     }
   }
 </script>

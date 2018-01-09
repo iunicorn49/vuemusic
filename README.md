@@ -1,3 +1,9 @@
+记得做: 研究 node 开启服务器, 通过 axios 伪造代理获取请求
+
+
+
+
+
 # vue-music
 
 ## 依赖
@@ -53,3 +59,14 @@ box.className = 'newClass'
 console.log(box.className)
 ```
 
+### JSONP有时会报500的错误
+
+请求接口的时候, 请求头中的 **Host** 和 **Referer** 所引起的.
+
+解决方法: 后端代理.
+
+使用 **axios** .
+
+这个库在前端环境下, 发送ajax请求, 在node环境下发送http请求.
+
+在node下通过代理, 这样, 在前端就不能发送 **jsonp** 请求了, 要发送 **ajax** 请求.

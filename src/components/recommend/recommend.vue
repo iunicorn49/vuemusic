@@ -22,7 +22,7 @@
 
 <script type="text/ecmascript-6">
   import Slider from 'base/slider/slider'
-  import {getRecommend} from 'api/recommend'
+  import {getRecommend, getDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
   export default {
     data() {
@@ -32,17 +32,24 @@
     },
     created() {
       this._getRecommend()
+      this._getDiscList()
     }, // created end
     methods: {
       // 我们getRecommend封装的是一个Promise对象,所以可以从then方法拿到返回的数据
       _getRecommend() {
-        getRecommend().then((res) => {
+        getRecommend().then(res => {
           if (res.code === ERR_OK) {
             this.recommends = res.data.slider
-            console.log(res.data.slider)
           }
         })
-      } // _getCommend end
+      }, // _getCommend end
+      _getDiscList() {
+        getDiscList().then(res => {
+          if (res.code === ERR_OK) {
+            console.log(res)
+          }
+        })
+      }  //  _discList end
     }, // methods end
     components: {
       Slider
