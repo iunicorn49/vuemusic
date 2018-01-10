@@ -30,11 +30,15 @@
           </ul>
         </div>
       </div>
+      <div class="loading-container" v-show="!discList.length">
+        <Loading></Loading>
+      </div>
     </Scroll>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
+  import Loading from 'base/loading/loading'
   import Scroll from 'base/scroll/scroll'
   import Slider from 'base/slider/slider'
   import {getRecommend, getDiscList} from 'api/recommend'
@@ -64,7 +68,7 @@
             this.discList = res.data.list
           }
         })
-      },  //  _discList end
+      },  // _discList end
       loadImage() {
         if (!this.checkLoaded) {
           this.checkLoaded = true
@@ -72,11 +76,12 @@
             this.$refs.scroll.refresh()
           }, 20)
         }
-      }  //  loadImage end
+      }  // loadImage end
     }, // methods end
     components: {
       Scroll,
-      Slider
+      Slider,
+      Loading
     }
   }
 </script>

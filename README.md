@@ -107,4 +107,12 @@ console.log(box.className)
 
 ### 案例出出现的大量的setTimeout, 20ms
 
-浏览器会17ms刷新一次, 我们延迟执行, 可以优化性能, 避免获取不到dom对象
+浏览器会17ms刷新一次, 我们延迟执行, 可以优化性能, 避免获取不到dom对象.
+
+## javascript方法
+
+### stringObject.match()
+
+`stringObject.match(str || reg)`
+
+参数传入字符串或者正则, 用来匹配参数中的内容, 返回布尔值(不确定).

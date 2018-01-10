@@ -2,8 +2,8 @@
   <div id="app">
     <m-header></m-header>
     <tab></tab>
+    <!-- keep-alive 可以将 dom 缓存到 内存中 -->
     <keep-alive>
-      <!--  keep-alive 可以将 dom 缓存到 内存中  -->
       <router-view></router-view>
     </keep-alive>
   </div>
