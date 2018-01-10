@@ -11,24 +11,21 @@
 </template>
 
 <script type="text/ecmascript-6">
-  //  使用的一个第三方库,需要基于这个构建轮播图组件
+  // 使用的一个第三方库,需要基于这个构建轮播图组件
   import BScroll from 'better-scroll'
   import {addClass} from 'common/js/dom'
   export default {
-    //  自己定义属性
+    // 自己定义属性
     props: {
-      //  无线循环
-      loop: {
+      loop: { // 无限循环
         type: Boolean,
         default: true
       },
-      //  自动轮播
-      autoPlay: {
+      autoPlay: { // 自动轮播
         type: Boolean,
         default: true
       },
-      //  轮播间隔
-      interval: {
+      interval: { // 轮播间隔
         type: Number,
         default: 1000
       }
@@ -39,8 +36,7 @@
         currentPageIndex: 0
       }
     },
-    //  mounted钩子下才能获取dom元素
-    mounted() {
+    mounted() { // mounted钩子下才能获取dom元素
       setTimeout(() => {
         this._setSliderWidth()
         this._initDots()
@@ -48,21 +44,19 @@
         if (this.autoPlay) {
           this._play()
         }
-        //  监听窗口改变
-        window.addEventListener('resize', () => {
+        window.addEventListener('resize', () => { // 监听窗口改变
           if (!this.slider) return
           this._setSliderWidth(true)
-          //  better-scroll 的接口
-          this.slider.refresh()
+          this.slider.refresh() // better-scroll的接口
         })
-      }, 20) //  浏览器会每17毫秒刷新一次
+      }, 20) // 浏览器会每17毫秒刷新一次
     },
     methods: {
       _setSliderWidth(isResize) {
-        //  获取所有列表的元素,sliderGroup是一个dom对象
+        // 获取所有列表的元素,sliderGroup是一个dom对象
         this.children = this.$refs.sliderGroup.children
         let width = 0
-        //  获取单张banner的宽度
+        // 获取单张banner的宽度
         let sliderWidth = this.$refs.slider.clientWidth
         for (let i = 0; i < this.children.length; i++) {
           let child = this.children[i]
@@ -103,7 +97,7 @@
           }
         })
       },
-      //  自动轮播,其中所有的方法都属于 better-scroll
+      // 自动轮播,其中所有的方法都属于 better-scroll
       _play() {
         clearTimeout(this.timer)
         this.timer = setTimeout(() => {
@@ -112,7 +106,7 @@
       }
     },
     destroyed() {
-      //  当组件被销毁的时候,清掉所有定时器释放内存
+      // 当组件被销毁的时候,清掉所有定时器释放内存
       clearTimeout(this.timer)
     }
   }

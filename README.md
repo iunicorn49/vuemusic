@@ -24,11 +24,22 @@
 
 对 ES6 的API 进行转译
 
-## JSONP
+##第三方插件
+
+### fastclick
+
+在main.js中配置
+
+```javascript
+import fastclick from 'fastclick'
+fastclick.attach(document.body)
+```
+
+### jsonp
 
 在发送请求之前, 先在 window 注册一个方法, 通过 script标签的src属性, 传输到服务器, 可以跨域抓取数据.
 
-地址: https://github.com/webmodules/jsonp
+官方地址: https://github.com/webmodules/jsonp
 
 ```javascript
 jsonp(url, opts, fn)
@@ -39,14 +50,37 @@ opts 是一个对象
 - param: 函数名
 - timeout: 最长等待时间
 
-
-##开发轮播图组件
-
 ###better-scroll
 
 官方文档: https://ustbhuangyi.github.io/better-scroll/doc/zh-hans/
 
-## JavaSCript
+### Vue-lazyload
+
+官方地址: https://github.com/hilongjw/vue-lazyload
+
+在main.js中配置
+
+```javascript
+import VueLazyLoad from 'vue-lazyload'
+Vue.use(VueLazyLoad, {
+  loading: require('common/image/default.png')
+})
+```
+
+在模板中应用
+
+```vue
+<template>
+  <div>
+    <!-- 引用插件前 -->
+	<img :src="item.imgurl">
+	<!-- 引用插件后 -->
+	<img v-lazy="item.imgurl">
+  </div>
+</template>
+```
+
+##小技巧
 
 ### className
 
@@ -70,3 +104,7 @@ console.log(box.className)
 这个库在前端环境下, 发送ajax请求, 在node环境下发送http请求.
 
 在node下通过代理, 这样, 在前端就不能发送 **jsonp** 请求了, 要发送 **ajax** 请求.
+
+### 案例出出现的大量的setTimeout, 20ms
+
+浏览器会17ms刷新一次, 我们延迟执行, 可以优化性能, 避免获取不到dom对象
