@@ -29,12 +29,15 @@
     },
     methods: {
       _initScroll() {
-        if (!this.$refs.wrapper) return
+        if (!this.$refs.wrapper) {
+          return
+        }
         this.scroll = new BScroll(this.$refs.wrapper, {
           probeType: this.probeType,
           click: this.click
         })
       },
+      // 下面的方法都是从better-scroll实例的原型上调用的
       enable() {  //  启用better-scroll,默认开启
         this.scroll && this.scroll.enable()
       },
@@ -43,6 +46,12 @@
       },
       refresh() {  //  重新计算高度
         this.scroll && this.scroll.refresh()
+      },
+      scrollTo() { // 滚动
+        this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+      },
+      scrollToElement() { // 滚动至
+        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
       }
     },
     watch: {
