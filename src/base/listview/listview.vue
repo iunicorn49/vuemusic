@@ -1,5 +1,10 @@
 <template>
-  <Scroll class="listview" :data="data" ref="listview">
+  <Scroll class="listview"
+          :data="data"
+          :listenScroll="listenScroll"
+          :probeType="probeType"
+          @scroll="scroll"
+          ref="listview">
     <!-- 整体 -->
     <ul>
       <li v-for="group in data" class="list-group" ref="listGroup">
@@ -21,7 +26,10 @@
          @touchstart="onShortcutTouchStart"
          @touchmove.stop.prevent="onShortcutTouchMove">
       <ul>
-        <li v-for="(item, index) in shortcutList" :data-index="index" class="item">
+        <li v-for="(item, index) in shortcutList"
+            :data-index="index"
+            class="item"
+            :class="{'current': currentIndex == index}">
           {{item}}
         </li>
       </ul>
@@ -38,7 +46,16 @@
   export default {
     created() {
       this.touch = {} // 如果不需要对dom进行绑定,可以在这里定义一个容器用来存储数据
+      this.listenScroll = true // 通过v-bind将这个值绑定给scroll组件
+      this.listHeight = [] // 用来存放各个锚点的y坐标
+      this.probeType = 3
     }, // created end
+    data() {
+      return {
+        scrollY: -1,
+        currentIndex: 0
+      }
+    }, // data end
     props: {
       data: {
         type: Array,
@@ -64,15 +81,58 @@
       onShortcutTouchMove(e) { // 右侧快速入口列表,滑动效果
         let firstTouch = e.touches[0]
         this.touch.y2 = firstTouch.pageY
-        // y轴偏移的锚点,`||0` 是向下取整的意思,和Math.floor的效果一样
-        let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT || 0
-        let anchorIndex = this.touch.anchorIndex + delta
+        // y轴偏移的锚点,'|'在js整数操作的时候,相当于去除小数点,parseInt。在正数的时候相当于Math.floor(),负数的时候相当于Math.ceil()
+        let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
+        // 记得转化为数值
+        let anchorIndex = (+this.touch.anchorIndex) + delta
+        console.log(anchorIndex)
         this._scrollTo(anchorIndex)
       }, // shortcutList end
+      scroll(pos) {
+        this.scrollY = pos.y
+      }, // scroll end
+      _calculateHeight() {
+        this.listHeight = []
+        const list = this.$refs.listGroup // 获取所有li元素
+        let height = 0
+        this.listHeight.push(height)
+        for (let i = 0; i < list.length; i++) {
+          let item = list[i]
+          height += item.clientHeight
+          this.listHeight.push(height)
+        }
+      }, // _calculateHeight end
       _scrollTo(index) {
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
       } // _scrollTo end
     }, // methods end
+    watch: {
+      data() {
+        setTimeout(() => {
+          this._calculateHeight()
+        }, 20)
+      }, // data end
+      scrollY(newY) {
+        const listHeight = this.listHeight
+        // 当页面在顶部
+        if (newY > 0) {
+          this.currentIndex = 0
+          return
+        }
+        // 页面在中间部分,listHeight比元素总个数多一个
+        for (let i = 0; i < listHeight.length - 1; i++) {
+          let height1 = listHeight[i] // 区块顶端
+          let height2 = listHeight[i + 1] // 区块底端
+          // 向上滚动式,y是负值,-newy就是正值
+          if (-newY > height1 && -newY < height2) {
+            this.currentIndex = i
+            return
+          }
+          // 当页面滚动到底部,且-newY大于最后一个元素的上限,这个例子的最后一个元素太高,貌似无法验证
+          this.currentIndex = listHeight.length - 2
+        }
+      }
+    }, // watch end
     components: {
       Scroll
     } // components end

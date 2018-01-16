@@ -20,6 +20,10 @@
       data: {
         type: Array,
         default: null
+      },
+      listenScroll: {
+        type: Boolean,
+        default: false
       }
     },
     mounted() {
@@ -36,6 +40,14 @@
           probeType: this.probeType,
           click: this.click
         })
+        if (this.listenScroll) {
+          let me = this // 保留vue实例的this
+          // 这个貌似是原生scroll的事件
+          this.scroll.on('scroll', pos => {
+            // 里面调用better-scroll事件
+            me.$emit('scroll', pos)
+          })
+        }
       },
       // 下面的方法都是从better-scroll实例的原型上调用的
       enable() {  //  启用better-scroll,默认开启
