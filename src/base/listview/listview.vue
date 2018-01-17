@@ -34,17 +34,22 @@
         </li>
       </ul>
     </div>
-    <div class="list-fixed" v-show="fixedTitle">
+    <div class="list-fixed" v-show="fixedTitle" ref="fixed">
       <h1 class="fixed-title">{{fixedTitle}}</h1>
+    </div>
+    <div v-show="!data.length" class="loading-container">
+      <Loading></Loading>
     </div>
   </Scroll>
 </template>
 
 <script type="text/ecmascript-6">
   import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
   import {getData} from 'common/js/dom'
 
   const ANCHOR_HEIGHT = 18 // 锚点的高度,字体大小12,行高1倍,上下padding各3,总和18
+  const TITLE_HEIGHT = 30
 
   export default {
     created() {
@@ -56,7 +61,8 @@
     data() {
       return {
         scrollY: -1,
-        currentIndex: 0
+        currentIndex: 0,
+        diff: -1 // fixedTitle举例顶部的间距
       }
     }, // data end
     props: {
@@ -140,15 +146,23 @@
           // 向上滚动式,y是负值,-newy就是正值
           if (-newY >= height1 && -newY < height2) {
             this.currentIndex = i
+            this.diff = height2 + newY
             return
           }
         }
         // 当页面滚动到底部,且-newY大于最后一个元素的上限,这个例子的最后一个元素太高,貌似无法验证
         this.currentIndex = listHeight.length - 2
-      }
+      }, // scrollY end
+      diff(newVal) {
+        let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+        if (this.fixedTop === fixedTop) return
+        this.fixedTop = fixedTop
+        this.$refs.fixed.style.transform = `translate3d(0, ${fixedTop}px, 0)`
+      } // diff end
     }, // watch end
     components: {
-      Scroll
+      Scroll,
+      Loading
     } // components end
   }
 </script>
