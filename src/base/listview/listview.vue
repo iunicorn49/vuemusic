@@ -23,16 +23,19 @@
          否则会时底层的列表一起触发这个事件
          还需要添加prevent阻止浏览器的原生滚动 -->
     <div class="list-shortcut"
-         @touchstart="onShortcutTouchStart"
+         @touchstart.stop.prevent="onShortcutTouchStart"
          @touchmove.stop.prevent="onShortcutTouchMove">
       <ul>
         <li v-for="(item, index) in shortcutList"
             :data-index="index"
             class="item"
-            :class="{'current': currentIndex == index}">
+            :class="{current: currentIndex === index}">
           {{item}}
         </li>
       </ul>
+    </div>
+    <div class="list-fixed" v-show="fixedTitle">
+      <h1 class="fixed-title">{{fixedTitle}}</h1>
     </div>
   </Scroll>
 </template>
@@ -63,6 +66,10 @@
       }
     }, // props end
     computed: {
+      fixedTitle() {
+        if (this.scrollY > 0) return false
+        return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
+      }, // fixedTitle end
       shortcutList() { // 调整右侧快速入口列表的数据
         return this.data.map(group => {
           // 截取"热门"的第一个字:热
@@ -85,7 +92,6 @@
         let delta = (this.touch.y2 - this.touch.y1) / ANCHOR_HEIGHT | 0
         // 记得转化为数值
         let anchorIndex = (+this.touch.anchorIndex) + delta
-        console.log(anchorIndex)
         this._scrollTo(anchorIndex)
       }, // shortcutList end
       scroll(pos) {
@@ -103,6 +109,14 @@
         }
       }, // _calculateHeight end
       _scrollTo(index) {
+        // 右侧栏,上下两部分留白处理
+        if (!index && index !== 0) return
+        if (index < 0) {
+          index = 0
+        } else if (index > this.listHeight.length - 2) {
+          index = this.listHeight.length - 2
+        }
+        this.scrollY = -this.listHeight[index]
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
       } // _scrollTo end
     }, // methods end
@@ -124,13 +138,13 @@
           let height1 = listHeight[i] // 区块顶端
           let height2 = listHeight[i + 1] // 区块底端
           // 向上滚动式,y是负值,-newy就是正值
-          if (-newY > height1 && -newY < height2) {
+          if (-newY >= height1 && -newY < height2) {
             this.currentIndex = i
             return
           }
-          // 当页面滚动到底部,且-newY大于最后一个元素的上限,这个例子的最后一个元素太高,貌似无法验证
-          this.currentIndex = listHeight.length - 2
         }
+        // 当页面滚动到底部,且-newY大于最后一个元素的上限,这个例子的最后一个元素太高,貌似无法验证
+        this.currentIndex = listHeight.length - 2
       }
     }, // watch end
     components: {
