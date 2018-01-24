@@ -120,3 +120,8 @@ console.log(box.className)
 `stringObject.match(str || reg)`
 
 参数传入字符串或者正则, 用来匹配参数中的内容, 返回布尔值(不确定).
+
+## Vuex
+
+官方文档: https://vuex.vuejs.org/zh-cn/
+

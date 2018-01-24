@@ -27,4 +27,3 @@
   #app
     color: $color-theme
 </style>
-

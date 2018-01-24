@@ -10,7 +10,7 @@
       <li v-for="group in data" class="list-group" ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li v-for="item in group.items" class="list-group-item">
+          <li @click="selectItem(item)" v-for="item in group.items" class="list-group-item">
             <img v-lazy="item.avatar" class="avatar">
             <span class="name">{{item.name}}</span>
           </li>
@@ -124,7 +124,10 @@
         }
         this.scrollY = -this.listHeight[index]
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
-      } // _scrollTo end
+      }, // _scrollTo end
+      selectItem(item) { // 这个组件被点击的时候,告诉外部我某个东西被点击了,顺便把参数传出去,自己本身不处理任何业务逻辑
+        this.$emit('select', item)
+      } // selectItem end
     }, // methods end
     watch: {
       data() {
