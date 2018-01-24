@@ -10,6 +10,7 @@
   import {ERR_OK} from 'api/config'
   import Singer from 'common/js/singer'
   import ListView from 'base/listview/listview'
+  import {mapMutations} from 'vuex' // vuex的方法
 
   const HOT_NAME = '热门'
   const HOT_SINGER_LEN = 10
@@ -27,6 +28,8 @@
         this.$router.push({ // router 编程式接口
           path: `/singer/${singer.id}`
         })
+        // vuex的语法糖
+        this.setSinger(singer)
       }, // selectSinger end
       _getSingerList() {
         getSingerList().then(res => {
@@ -76,7 +79,10 @@
           })
         }
         return hot.concat(ret)
-      } // _normalizeSinger end
+      }, // _normalizeSinger end
+      ...mapMutations({ // 映射
+        setSinger: 'SET_SINGER'
+      })
     }, // methods end
     components: {
       ListView
