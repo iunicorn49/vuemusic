@@ -21,7 +21,7 @@
         <div class="middle">
           <div class="middle-l">
             <div class="cd-wrapper" ref="cdWrapper">
-              <div class="cd">
+              <div class="cd" :class="cdCls">
                 <img class="image" :src="currentSong.image">
               </div>
             </div>
@@ -36,7 +36,7 @@
               <i class="icon-prev"></i>
             </div>
             <div class="icon i-center">
-              <i class="icon-play"></i>
+              <i @click="togglePlaying" :class="playIcon"></i>
             </div>
             <div class="icon i-right">
               <i class="icon-next"></i>
@@ -52,19 +52,22 @@
       <div class="mini-player" v-show="!fullScreen" @click="open">
         <div class="icon">
           <div class="imgWrapper">
-            <img width="40" height="40" :src="currentSong.image">
+            <img width="40" height="40" :class="cdCls" :src="currentSong.image">
           </div>
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
-        <div class="control"></div>
+        <div class="control">
+          <i @click.stop="togglePlaying" :class="miniIcon"></i>
+        </div>
         <div class="control">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <audio ref="audio" :src="currentSong.url"></audio>
   </div>
 </template>
 
@@ -83,6 +86,9 @@
       open() {
         this.setFullScreen(true)
       },
+      togglePlaying() {
+        this.setPlayingState(!this.playing)
+      }, // togglePlaying end
       // vue自带的动画钩子
       enter(el, done) {
         const {x, y, scale} = this._getPosAndScale()
@@ -137,15 +143,39 @@
         return {x, y, scale}
       }, // _getPosAndScale end
       ...mapMutations({
-        setFullScreen: 'SET_FULL_SCREEN'
+        setFullScreen: 'SET_FULL_SCREEN',
+        setPlayingState: 'SET_PLAYING_STATE'
       })
     }, // methods end
     computed: {
+      cdCls() {
+        return this.playing ? 'play' : 'play pause'
+      },
+      playIcon() {
+        return this.playing ? 'icon-pause' : 'icon-play'
+      }, // playIcon end
+      miniIcon() {
+        return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
+      }, // miniIcon end
       ...mapGetters([
         'playlist',
         'fullScreen',
-        'currentSong'
+        'currentSong',
+        'playing'
       ])
+    }, // computed end
+    watch: {
+      currentSong() {
+        this.$nextTick(() => {
+          this.$refs.audio.play()
+        })
+      },
+      playing(newPlaying) {
+        const audio = this.$refs.audio
+        this.$nextTick(() => {
+          newPlaying ? audio.play() : audio.pause()
+        })
+      }
     }
   }
 </script>
@@ -234,8 +264,10 @@
                 box-sizing: border-box
                 border-radius: 50%
                 border: 10px solid rgba(255, 255, 255, 0.1)
-              .play
+              &.play
                 animation: rotate 20s linear infinite
+              &.pause
+                animation-play-state: paused
           .playing-lyric-wrapper
             width: 80%
             margin: 30px auto 0 auto

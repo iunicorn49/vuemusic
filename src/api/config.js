@@ -11,7 +11,8 @@ export const commonParams = {
 }
 
 export const options = {
-  param: 'jsonpCallback' // QQ音乐 jsonp约定的函数名
+  param: 'jsonpCallback', // QQ音乐 jsonp约定的函数名
+  prefix: 'jp'
 }
 
 // 大部分公司请求数据成功的返回 code 是0,自定义常量,其他方法判断的时候,直接指对比 ERR_OK,没有实际意义

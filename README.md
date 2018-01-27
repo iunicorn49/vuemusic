@@ -4,7 +4,7 @@
 
 ## 项目问题
 
-
+this.$nextTick()
 
 
 
