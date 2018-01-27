@@ -84,6 +84,10 @@ Vue.use(VueLazyLoad, {
 </template>
 ```
 
+### create-keyframe-animation
+
+官方地址: https://github.com/HenrikJoreteg/create-keyframe-animation
+
 ##小技巧
 
 ### className
