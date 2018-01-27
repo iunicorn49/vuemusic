@@ -1,6 +1,3 @@
-/**
- * Created by zlk on 2018/1/10.
- */
 import jsonp from 'common/js/jsonp'
 import {commonParams, options} from './config' // config 暴露了多个常量, 所以用 {}
 
