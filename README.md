@@ -6,7 +6,7 @@
 
 this.$nextTick()
 
-
+Element.getBoundingClientRect()
 
 # vue-music
 

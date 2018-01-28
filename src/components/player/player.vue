@@ -31,13 +31,13 @@
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
-              <progress-bar :percent="percent"></progress-bar>
+              <progress-bar @percentChange="onProgressBarChange" :percent="percent"></progress-bar>
             </div>
             <span class="time time-r">{{format(currentSong.duration)}}</span>
           </div>
           <div class="operators">
-            <div class="icon i-left">
-              <i class="icon-sequence"></i>
+            <div class="icon i-left" @click="changeMode">
+              <i :class="iconMode"></i>
             </div>
             <div class="icon i-left" :class="disableCls">
               <i @click="prev" class="icon-prev"></i>
@@ -67,7 +67,9 @@
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i @click.stop="togglePlaying" :class="miniIcon"></i>
+          <progress-circle :radius="radius" :percent="percent">
+            <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
+          </progress-circle>
         </div>
         <div class="control">
           <i class="icon-playlist"></i>
@@ -80,6 +82,7 @@
     <audio @canplay="ready"
            @error="error"
            @timeupdate="updateTime"
+           @ended="end"
            ref="audio"
            :src="currentSong.url"></audio>
   </div>
@@ -90,6 +93,9 @@
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import ProgressBar from 'base/progress-bar/progress-bar'
+  import ProgressCircle from 'base/progress-circle/progress-circle'
+  import {playMode} from 'common/js/config'
+  import {shuffle} from 'common/js/util'
 
   const transform = prefixStyle('transform')
 
@@ -97,7 +103,8 @@
     data() {
       return {
         songReady: false,
-        currentTime: 0
+        currentTime: 0,
+        radius: 32 // 数据来自css预设
       }
     }, // data end
     methods: {
@@ -110,6 +117,17 @@
       togglePlaying() {
         this.setPlayingState(!this.playing)
       }, // togglePlaying end
+      end() {
+        if (this.mode === playMode.loop) {
+          this.loop()
+        } else {
+          this.next()
+        }
+      }, // end
+      loop() {
+        this.$refs.audio.currentTime = 0
+        this.$refs.audio.play()
+      }, // loop
       /**
        * songReady用于节流
        */
@@ -183,6 +201,29 @@
         const second = this._pad(interval % 60)
         return `${minute}:${second}`
       }, // format end
+      onProgressBarChange(percent) {
+        this.$refs.audio.currentTime = this.currentSong.duration * percent
+        if (!this.playing) this.togglePlaying()
+      }, // onProgressBarChange
+      changeMode() {
+        // 三种状态,余3
+        const mode = (this.mode + 1) % 3
+        this.setPlayMode(mode)
+        let list = null
+        if (mode === playMode.random) {
+          list = shuffle(this.sequenceList)
+        } else {
+          list = this.sequenceList
+        }
+        this.resetCurrentIndex(list)
+        this.setPlayList(list)
+      }, // changeMode
+      resetCurrentIndex(list) { // 找出目前正在播放的歌曲
+        let index = list.findIndex(item => {
+          return item.id === this.currentSong.id
+        })
+        this.setCurrentIndex(index)
+      }, // resetCurrentIndex
       // 补零,n=2的意思是,n默认值为2
       _pad(num, n = 2) {
         let len = num.toString().length
@@ -207,7 +248,9 @@
       ...mapMutations({
         setFullScreen: 'SET_FULL_SCREEN',
         setPlayingState: 'SET_PLAYING_STATE',
-        setCurrentIndex: 'SET_CURRENT_INDEX'
+        setCurrentIndex: 'SET_CURRENT_INDEX',
+        setPlayMode: 'SET_PLAY_MODE',
+        setPlayList: 'SET_PLAYLIST'
       })
     }, // methods end
     computed: {
@@ -217,6 +260,12 @@
       playIcon() {
         return this.playing ? 'icon-pause' : 'icon-play'
       }, // playIcon end
+      iconMode() {
+        return this.mode === playMode.sequence
+          ? 'icon-sequence'
+          : this.mode === playMode.loop
+          ? 'icon-loop' : 'icon-random'
+      }, // iconMode
       miniIcon() {
         return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
       }, // miniIcon end
@@ -231,11 +280,14 @@
         'fullScreen',
         'currentSong',
         'playing',
-        'currentIndex'
+        'currentIndex',
+        'mode',
+        'sequenceList'
       ])
     }, // computed end
     watch: {
-      currentSong() {
+      currentSong(newVal, val) {
+        if (newVal.id === val.id) return // 在暂停时,切换播放模式时,不触发
         this.$nextTick(() => {
           this.$refs.audio.play()
         })
@@ -248,7 +300,8 @@
       }
     }, // watch
     components: {
-      ProgressBar
+      ProgressBar,
+      ProgressCircle
     }
   }
 </script>
