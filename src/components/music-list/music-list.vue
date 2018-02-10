@@ -39,12 +39,14 @@
   import Loading from 'base/loading/loading'
   import {prefixStyle} from 'common/js/dom'
   import {mapActions} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
 
   const RESERVED_HEIGHT = 40
   const transform = prefixStyle('transform')
   const backdrop = prefixStyle('backdrop-filter')
 
   export default {
+    mixins: [playlistMixin], // 注入代码,组件同名的方法会覆盖mixins中的方法
     props: {
       bgImage: {type: String, default: ''},
       songs: {type: Array, default: []},
@@ -70,6 +72,11 @@
       this.$refs.list.$el.style.top = `${this.imageHeight}px`
     }, // mounted end
     methods: {
+      handlePlaylist(playlist) { // mixins 中指定的方法名称, playlist是mixins中的playlist
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.list.$el.style.bottom = bottom
+        this.$refs.list.refresh()
+      },
       scroll(pos) {
         this.scrollY = pos.y
       },

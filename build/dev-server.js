@@ -39,6 +39,29 @@ apiRoutes.get('/getDiscList', function (req, res) {
     console.log(e)
   })
 })
+// 抓取歌词
+apiRoutes.get('/lyric', function (req, res) {
+  var url = 'https://c.y.qq.com/lyric/fcgi-bin/fcg_query_lyric_new.fcg'
+  axios.get(url, {
+    headers: {
+      referer: 'https://c.y.qq.com/',
+      host: 'c.y.qq.com'
+    },
+    params: req.query
+  }).then((response) => {
+    var ret = response.data
+    if(typeof ret === 'string') {
+      var reg = /^\w+\(({[^()]+})\)$/ // 可以捕获jsonp的callback中的字符串
+      var matches = ret.match(reg)
+      if (matches) {
+        ret = JSON.parse(matches[1])
+      }
+    }
+    res.json(ret)
+  }).catch((e) => {
+    console.log(e)
+  })
+})
 
 app.use('/api', apiRoutes)
 

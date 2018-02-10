@@ -1,5 +1,5 @@
 <template>
-  <!-- 这个好像是vue自带的转场动画 -->
+  <!-- 这个好像是vue自带的动画组件 -->
   <transition name="slide">
     <music-list
       :songs="songs"
@@ -75,7 +75,7 @@
 <style scoped lang="stylus" rel="stylesheet/stylus">
   @import "~common/stylus/variable"
 
-  // vue自带的转场动画
+  // vue动画
   .slide-enter-active, .slide-leave-active
     transition: all 0.3s
   .slide-enter, .slide-leave-to

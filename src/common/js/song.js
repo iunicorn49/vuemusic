@@ -21,13 +21,12 @@ export default class Song {
     } else {
       this._genUrl()
     }
-  }
+  } // constructor end
 
   getLyric() {
-    if (this.lyric) {
+    if (this.lyric) { // 每次song变化都会触发一次,不合理,如果已经存在,则返回已经获取的歌词
       return Promise.resolve(this.lyric)
     }
-
     return new Promise((resolve, reject) => {
       getLyric(this.mid).then((res) => {
         if (res.retcode === ERR_OK) {
@@ -38,7 +37,7 @@ export default class Song {
         }
       })
     })
-  }
+  } // getLyric end
 
   _genUrl() {
     if (this.url) {

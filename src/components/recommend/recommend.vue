@@ -1,5 +1,5 @@
 <template>
-  <div class="recommend">
+  <div class="recommend" ref="recommend">
     <Scroll ref="scroll" class="recommend-content" :data="discList">
       <div>
         <div v-if="recommends.length" class="slider-wrapper">
@@ -43,7 +43,10 @@
   import Slider from 'base/slider/slider'
   import {getRecommend, getDiscList} from 'api/recommend'
   import {ERR_OK} from 'api/config'
+  import {playlistMixin} from 'common/js/mixin'
+
   export default {
+    mixins: [playlistMixin],
     data() {
       return {
         recommends: [], // 轮播图数据
@@ -55,6 +58,11 @@
       this._getDiscList()
     }, // created end
     methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.recommend.style.bottom = bottom
+        this.$refs.scroll.refresh() // 调用这个组件中的方法
+      },
       _getRecommend() { // 我们getRecommend封装的是一个Promise对象,所以可以从then方法拿到返回的数据
         getRecommend().then(res => {
           if (res.code === ERR_OK) {

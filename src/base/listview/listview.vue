@@ -100,6 +100,9 @@
         let anchorIndex = (+this.touch.anchorIndex) + delta
         this._scrollTo(anchorIndex)
       }, // shortcutList end
+      refresh() {
+        this.$refs.listview.refresh() // scroll组件的refresh方法
+      },
       scroll(pos) {
         this.scrollY = pos.y
       }, // scroll end
