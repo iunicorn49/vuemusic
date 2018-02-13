@@ -8,7 +8,8 @@ const state = {
   sequenceList: [], // 顺序播放列表,当播放模式为顺序播放时,次列表应当和playList相同
   mode: playMode.sequence, // 播放模式,默认顺序播放
   currentIndex: -1, // 当前播放的索引
-  disc: {}
+  disc: {},
+  topList: {} // rank列表
 }
 
 export default state

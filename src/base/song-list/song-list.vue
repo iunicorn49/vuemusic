@@ -2,6 +2,9 @@
   <div class="song-list">
     <ul>
       <li @click="selectItem(song,index)" v-for="(song,index) in songs" class="item">
+        <div class="rank" v-show="rank">
+          <span :class="getRankCls(index)">{{getRankText(index)}}</span>
+        </div>
         <div class="content">
           <h2 class="name">{{song.name}}</h2>
           <p class="desc">{{getDesc(song)}}</p>
@@ -14,7 +17,8 @@
 <script type="text/ecmascript-6">
   export default {
     props: {
-      songs: {type: Array, default: []}
+      songs: {type: Array, default: []},
+      rank: {type: Boolean, default: false}
     }, // props end
     methods: {
       selectItem(item, index) { // 子传父传值
@@ -22,7 +26,19 @@
       }, // selectItem end
       getDesc(song) {
         return `${song.singer}. ${song.album}`
-      } // getDesc end
+      }, // getDesc end
+      getRankCls(index) {
+        if (index <= 2) {
+          return `icon icon${index}`
+        } else {
+          return 'text'
+        }
+      }, // 前三类名
+      getRankText(index) {
+        if (index > 2) {
+          return index + 1
+        }
+      } // 前三文案
     }
   }
 </script>

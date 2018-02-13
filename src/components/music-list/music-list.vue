@@ -23,6 +23,7 @@
       <div class="song-list-wrapper">
         <song-list
           @select="selectItem"
+          :rank="rank"
           :songs="songs">
         </song-list>
       </div>
@@ -50,7 +51,8 @@
     props: {
       bgImage: {type: String, default: ''},
       songs: {type: Array, default: []},
-      title: {type: String, default: ''}
+      title: {type: String, default: ''},
+      rank: {type: Boolean, default: false}
     }, // props end
     data() {
       return {
