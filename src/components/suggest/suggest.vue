@@ -1,5 +1,5 @@
 <template>
-  <div class="suggest">
+  <Scroll :pullup="pullup" :data="result" class="suggest" @scrollToEnd="searchMore" ref="suggest">
     <ul class="suggest-list">
       <li v-for="item in result" class="suggest-item">
         <div class="icon">
@@ -9,16 +9,20 @@
           <p class="text" v-html="getDisplayName(item)"></p>
         </div>
       </li>
+      <Loading v-show="hasMore" title=""></Loading>
     </ul>
-  </div>
+  </Scroll>
 </template>
 
 <script type="text/ecmascript-6">
   import {search} from 'api/search'
   import {ERR_OK} from 'api/config'
-  import {filterSinger} from 'common/js/song'
+  import {createSong} from 'common/js/song'
+  import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
 
   const TYPE_SINGER = 'singer' // 区分是否是歌手
+  const perpage = 20 // 单词查询条目数
 
   export default {
     props: {
@@ -28,27 +32,58 @@
     data() {
       return {
         page: 1, // 当前页
-        result: [] // 搜索返回的数据
+        result: [], // 搜索返回的数据
+        pullup: true, // 上啦刷新
+        hasMore: true // 是否可以加载更多
       }
     },
     methods: {
-      search() {
-        search(this.query, this.page, this.showSinger).then(res => {
+      search() { // 第一次进入触发, 所以, 需要全部初始化
+        this.page = 1
+        this.hasMore = true
+        this.$refs.suggest.scrollTo(0, 0) // 返回初始位置
+        search(this.query, this.page, this.showSinger, perpage).then(res => {
           if (res.code === ERR_OK) {
             this.result = this._genResult(res.data)
+            this._checkMore(res.data)
           }
         })
       }, // search
+      searchMore() { // 下拉刷新触发
+        if (!this.hasMore) return
+        this.page++
+        search(this.query, this.page, this.showSinger, perpage).then(res => {
+          if (res.code === ERR_OK) {
+            this.result = this.result.concat(this._genResult(res.data))
+            this._checkMore(res.data)
+          }
+        })
+      },
       _genResult(data) {
         let ret = []
         if (data.zhida && data.zhida.singerid) { // 判断是否有歌直达
           ret.push({...data.zhida, ...{type: TYPE_SINGER}})
         }
         if (data.song) { // 判断是否有音乐数据
-          ret = ret.concat(data.song.list)
+          ret = ret.concat(this._normalizeSongs(data.song.list))
         }
         return ret
       }, // _genResult
+      _normalizeSongs(list) {
+        let ret = []
+        list.forEach(musicData => {
+          if (musicData.songid && musicData.albumid) {
+            ret.push(createSong(musicData))
+          }
+        })
+        return ret
+      },
+      _checkMore(data) { // 检测是否还能获取更多数据
+        const song = data.song
+        if (!song.list.length || (song.curnum + (song.curpage - 1) * perpage) >= song.totalnum) {
+          this.hasMore = false
+        }
+      },
       getIconCls(item) { // 返回类名
         if (item.type === TYPE_SINGER) {
           return 'icon-mine'
@@ -60,15 +95,18 @@
         if (item.type === TYPE_SINGER) {
           return item.singername
         } else {
-          return `${item.songname}-${filterSinger(item.singer)}`
+          return `${item.name}-${item.singer}`
         }
       } // getDisplayName
     },
     watch: {
       query(query) {
-        console.log(query)
         this.search()
       }
+    },
+    components: {
+      Scroll,
+      Loading
     }
   }
 </script>

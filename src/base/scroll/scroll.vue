@@ -9,22 +9,11 @@
   export default {
     //  配置参考better-scroll的官方文档
     props: {
-      probeType: {
-        type: Number,
-        default: 1
-      },
-      click: {
-        type: Boolean,
-        default: true
-      },
-      data: {
-        type: Array,
-        default: null
-      },
-      listenScroll: {
-        type: Boolean,
-        default: false
-      }
+      probeType: {type: Number, default: 1}, // betterScroll配置项,滚动方式
+      click: {type: Boolean, default: true}, // 是否触发点击
+      data: {type: Array, default: null}, // 外部传入的数据, 用于决定组件的宽高
+      listenScroll: {type: Boolean, default: false}, // 是否监听滚动坐标
+      pullup: {type: Boolean, default: false} // 上拉刷新
     },
     mounted() {
       setTimeout(() => {
@@ -32,7 +21,7 @@
       }, 20)
     },
     methods: {
-      _initScroll() {
+      _initScroll() { // 初始化组件
         if (!this.$refs.wrapper) {
           return
         }
@@ -44,8 +33,15 @@
           let me = this // 保留vue实例的this
           // 这个貌似是原生scroll的事件
           this.scroll.on('scroll', pos => {
-            // 里面调用better-scroll事件
+            // 向外面派发事件
             me.$emit('scroll', pos)
+          })
+        }
+        if (this.pullup) {
+          this.scroll.on('scrollEnd', () => {
+            if (this.scroll.y <= this.scroll.maxScrollY + 50) {
+              this.$emit('scrollToEnd') // 满足条件,向外面派发事件.
+            }
           })
         }
       },
