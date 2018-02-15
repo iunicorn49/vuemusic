@@ -94,11 +94,12 @@
             <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
         </div>
-        <div class="control">
+        <div class="control" @click="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
     </transition>
+    <Playlist ref="playlist"></Playlist>
     <!-- canplay:当这个标签准备好了之后触发
          error:当url有问题时以及出现网络问题时触发
          timpeupdate:播放进度改变时触发 -->
@@ -121,6 +122,7 @@
   import {shuffle} from 'common/js/util'
   import Lyric from 'lyric-parser'
   import Scroll from 'base/scroll/scroll'
+  import Playlist from 'components/playlist/playlist'
 
   const transform = prefixStyle('transform')
   const transitionDuration = prefixStyle('transitionDuration')
@@ -141,6 +143,9 @@
       this.touch = {} // 用来存放左右滑动的参数,不需要进行数据绑定,所以不用添加到data中
     },
     methods: {
+      showPlaylist() {
+        this.$refs.playlist.show()
+      },
       back() {
         this.setFullScreen(false)
       }, // back end
@@ -431,7 +436,8 @@
     components: {
       ProgressBar,
       ProgressCircle,
-      Scroll
+      Scroll,
+      Playlist
     }
   }
 </script>
