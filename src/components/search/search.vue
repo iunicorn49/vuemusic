@@ -3,21 +3,38 @@
     <div class="search-box-wrapper">
       <SearchBox ref="searchBox" @queryEvent="onQueryChange"></SearchBox>
     </div>
-    <div class="shortcut-wrapper" v-show="!query">
-      <div class="shortcut">
-        <div class="hot-key">
-          <h1 class="title">热门搜索</h1>
-          <ul>
-            <li @click="addQuery(item.k)" v-for="item in hotKey" class="item">
-              <span>{{item.k}}</span>
-            </li>
-          </ul>
+    <div ref="shortcutWrapper" class="shortcut-wrapper" v-show="!query">
+      <Scroll ref="shortcut" class="shortcut" :data="shortcut">
+        <div>
+          <div class="hot-key">
+            <h1 class="title">热门搜索</h1>
+            <ul>
+              <li @click="addQuery(item.k)" v-for="item in hotKey" class="item">
+                <span>{{item.k}}</span>
+              </li>
+            </ul>
+          </div>
+          <div class="search-history" v-show="searchHistory.length">
+            <h1 class="title">
+              <span class="text">搜索历史</span>
+              <span class="clear" @click="showConfrim">
+              <i class="icon-clear"></i>
+            </span>
+            </h1>
+            <SearchList @select="addQuery" @delete="deleteOne" :searches="searchHistory"></SearchList>
+          </div>
         </div>
-      </div>
+      </Scroll>
     </div>
-    <div class="search-result" v-show="query">
-      <Suggest @select="saveSearch" @listScroll="blurInput" :query="query"></Suggest>
+    <div ref="searchResult" class="search-result" v-show="query">
+      <Suggest ref="suggest" @select="saveSearch" @listScroll="blurInput" :query="query"></Suggest>
     </div>
+    <Confirm
+      @confirm="deleteAll"
+      text="是否清空所有搜索历史"
+      confirmBtnText="清空"
+      ref="confirm">
+    </Confirm>
     <router-view></router-view>
   </div>
 </template>
@@ -27,9 +44,14 @@
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
   import Suggest from 'components/suggest/suggest'
-  import {mapActions} from 'vuex'
+  import {mapActions, mapGetters} from 'vuex'
+  import SearchList from 'base/search-list/search-list'
+  import Confirm from 'base/confirm/confirm'
+  import Scroll from 'base/scroll/scroll'
+  import {playlistMixin} from 'common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],
     data() {
       return {
         hotKey: [],
@@ -38,8 +60,25 @@
     },
     created() {
       this._getHotKey()
+      console.log(this.searchHistory)
     },
     methods: {
+      handlePlaylist(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.shortcutWrapper.style.bottom = bottom
+        this.$refs.searchResult.style.bottom = bottom
+        this.$refs.shortcut.refresh() // 调用这个组件中的方法
+        this.$refs.suggest.refresh()
+      },
+      showConfrim() {
+        this.$refs.confirm.show()
+      },
+      deleteAll() {
+        this.clearSearchHistory()
+      },
+      deleteOne(item) {
+        this.deleteSearchHistory(item)
+      },
       saveSearch() { // 保存搜索历史
         this.saveSearchHistory(this.query)
       },
@@ -64,12 +103,34 @@
         this.$refs.searchBox.blur() // 调用子组件的方法
       },
       ...mapActions([
-        'saveSearchHistory'
+        'saveSearchHistory',
+        'deleteSearchHistory',
+        'clearSearchHistory'
       ])
+    },
+    computed: {
+      shortcut() { // 由于scoll组件中产生了两部分数据,所以,结合两个数据传入scroll组件
+        return this.hotKey.concat(this.searchHistory)
+      },
+      ...mapGetters([
+        'searchHistory'
+      ])
+    },
+    watch: {
+      query(newQ) {
+        if (!newQ) { // 当切换回来搜索主页面时,需要手动刷新一次scroll组件
+          setTimeout(() => {
+            this.$refs.shortcut.refresh()
+          }, 20)
+        }
+      }
     },
     components: {
       SearchBox,
-      Suggest
+      Suggest,
+      SearchList,
+      Confirm,
+      Scroll
     }
   }
 </script>

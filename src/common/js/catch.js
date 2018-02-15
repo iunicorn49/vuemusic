@@ -26,6 +26,13 @@ function insertArray(arr, val, compare, maxLen) {
   }
 }
 
+function deleteFromArray(arr, compare) {
+  const index = arr.findIndex(compare)
+  if (index > -1) {
+    arr.splice(index, 1)
+  }
+}
+
 /**
  * storage.get(key, def)
  * 参数一: key
@@ -46,4 +53,18 @@ export function saveSearch(query) {
  */
 export function loadSearch() {
   return storage.get(SEARCH_KEY, [])
+}
+
+export function deleteSearch(query) {
+  let searches = storage.get(SEARCH_KEY, [])
+  deleteFromArray(searches, item => {
+    return item === query
+  })
+  storage.set(SEARCH_KEY, searches) // 保存在本地缓存
+  return searches // 将数组抛出,给vuex
+}
+
+export function clearSearch() {
+  storage.remove(SEARCH_KEY)
+  return []
 }

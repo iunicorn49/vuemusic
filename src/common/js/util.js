@@ -17,7 +17,6 @@ export function shuffle(list) { // 随机排序
 export function debounce(func, delay) {
   let timer
   return function (...args) { // args(叫什么都没有关系)是$watch的参数
-    console.log(args)
     if (timer) {
       clearTimeout(timer)
     }
