@@ -34,6 +34,12 @@ export default new Router({
         { path: ':id', component: TopList }
       ]
     },
-    { path: '/search', component: Search }
+    {
+      path: '/search',
+      component: Search,
+      children: [
+        { path: ':id', component: SingerDetail }
+      ]
+    }
   ]
 }) // routes end

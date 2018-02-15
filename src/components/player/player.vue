@@ -306,7 +306,6 @@
           if (this.playing) {
             this.currentLyric.play()
           }
-          console.log(this.currentLyric)
         }).catch(() => { // 当获取不到歌词的情况下,执行的操作
           this.currentLyric = null
           this.playingLyric = ''

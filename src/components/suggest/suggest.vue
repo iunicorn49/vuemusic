@@ -1,7 +1,7 @@
 <template>
-  <Scroll :pullup="pullup" :data="result" class="suggest" @scrollToEnd="searchMore" ref="suggest">
+  <Scroll :beforeScroll="beforeScroll" @beforeScroll="listScroll" :pullup="pullup" :data="result" class="suggest" @scrollToEnd="searchMore" ref="suggest">
     <ul class="suggest-list">
-      <li v-for="item in result" class="suggest-item">
+      <li @click="selectItem(item)" v-for="item in result" class="suggest-item">
         <div class="icon">
           <i :class="getIconCls(item)"></i>
         </div>
@@ -11,6 +11,10 @@
       </li>
       <Loading v-show="hasMore" title=""></Loading>
     </ul>
+    <div class="no-result-wrapper">
+      <!-- 如果给组件传入固定的值,不需要v-bing,直接绑定属性名和属性值即可 -->
+      <NoResult v-show="!hasMore && !result.length" title="抱歉暂无搜索结果"></NoResult>
+    </div>
   </Scroll>
 </template>
 
@@ -20,6 +24,9 @@
   import {createSong} from 'common/js/song'
   import Scroll from 'base/scroll/scroll'
   import Loading from 'base/loading/loading'
+  import Singer from 'common/js/singer'
+  import {mapMutations, mapActions} from 'vuex'
+  import NoResult from 'base/no-result/no-result'
 
   const TYPE_SINGER = 'singer' // 区分是否是歌手
   const perpage = 20 // 单词查询条目数
@@ -34,10 +41,26 @@
         page: 1, // 当前页
         result: [], // 搜索返回的数据
         pullup: true, // 上啦刷新
-        hasMore: true // 是否可以加载更多
+        hasMore: true, // 是否可以加载更多
+        beforeScroll: true // 处理键盘
       }
     },
     methods: {
+      selectItem(item) {
+        if (item.type === TYPE_SINGER) {
+          const singer = new Singer({
+            id: item.singermid,
+            name: item.singername
+          })
+          this.$router.push({
+            path: `/search/${singer.id}`
+          })
+          this.setSinger(singer)
+        } else { // 如果不是歌手,就将歌曲插入到播放列表
+          this.insertSong(item)
+        }
+        this.$emit('select')
+      },
       search() { // 第一次进入触发, 所以, 需要全部初始化
         this.page = 1
         this.hasMore = true
@@ -97,7 +120,14 @@
         } else {
           return `${item.name}-${item.singer}`
         }
-      } // getDisplayName
+      }, // getDisplayName
+      listScroll() {
+        this.$emit('listScroll')
+      },
+      ...mapMutations({
+        setSinger: 'SET_SINGER'
+      }),
+      ...mapActions(['insertSong'])
     },
     watch: {
       query(query) {
@@ -106,7 +136,8 @@
     },
     components: {
       Scroll,
-      Loading
+      Loading,
+      NoResult
     }
   }
 </script>

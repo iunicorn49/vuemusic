@@ -13,7 +13,8 @@
       click: {type: Boolean, default: true}, // 是否触发点击
       data: {type: Array, default: null}, // 外部传入的数据, 用于决定组件的宽高
       listenScroll: {type: Boolean, default: false}, // 是否监听滚动坐标
-      pullup: {type: Boolean, default: false} // 上拉刷新
+      pullup: {type: Boolean, default: false}, // 上拉刷新
+      beforeScroll: {type: Boolean, default: false} // 滚动时,让input失去焦点,可以让键盘收起来
     },
     mounted() {
       setTimeout(() => {
@@ -42,6 +43,11 @@
             if (this.scroll.y <= this.scroll.maxScrollY + 50) {
               this.$emit('scrollToEnd') // 满足条件,向外面派发事件.
             }
+          })
+        }
+        if (this.beforeScroll) {
+          this.scroll.on('beforeScrollStart', () => {
+            this.$emit('beforeScroll')
           })
         }
       },

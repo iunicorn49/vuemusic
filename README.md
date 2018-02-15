@@ -30,6 +30,12 @@ Element.getBoundingClientRect()
 
 ##第三方插件
 
+### good-storage
+
+官方地址: https://github.com/ustbhuangyi/storage
+
+对 sessionStorage 和 localStorage 的封装.
+
 ### fastclick
 
 在main.js中配置

@@ -12,3 +12,17 @@ export function shuffle(list) { // 随机排序
   }
   return arr
 }
+
+// 节流函数
+export function debounce(func, delay) {
+  let timer
+  return function (...args) { // args(叫什么都没有关系)是$watch的参数
+    console.log(args)
+    if (timer) {
+      clearTimeout(timer)
+    }
+    timer = setTimeout(() => {
+      func.apply(this, args) // this 指向vue实例
+    }, delay)
+  }
+}

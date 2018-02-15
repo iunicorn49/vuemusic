@@ -55,7 +55,7 @@
         list.forEach((item, index) => {
           // 取前10条当做热门歌手,并填充东西
           if (index < HOT_SINGER_LEN) {
-            map.hot.items.push(new Singer(item.Fsinger_mid, item.Fsinger_name))
+            map.hot.items.push(new Singer({id: item.Fsinger_mid, name: item.Fsinger_name}))
           }
           // 按照数据中的Findex进行分类
           const key = item.Findex
@@ -67,7 +67,7 @@
             }
           }
           // 如有分类直接填充东西
-          map[key].items.push(new Singer(item.Fsinger_mid, item.Fsinger_name))
+          map[key].items.push(new Singer({id: item.Fsinger_mid, name: item.Fsinger_name}))
         })
         // 将map进行排序,获得有序列表
         let hot = []
