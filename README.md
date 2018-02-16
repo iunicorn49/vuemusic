@@ -1,4 +1,4 @@
-##记得做
+## 记得做
 
 - 研究 node 开启服务器, 通过 axios 伪造代理获取请求
 
@@ -14,11 +14,11 @@ Element.getBoundingClientRect()
 
 ### -S
 
-####babel-runtime
+####nbabel-runtime
 
 对 ES 语法进行转译
 
-####fastclick
+#### fastclick
 
 解决移动端 300ms 延迟
 
@@ -28,7 +28,7 @@ Element.getBoundingClientRect()
 
 对 ES6 的API 进行转译
 
-##第三方插件
+## 第三方插件
 
 ### good-storage
 
@@ -60,7 +60,7 @@ opts 是一个对象
 - param: 函数名
 - timeout: 最长等待时间
 
-###better-scroll
+### better-scroll
 
 官方文档: https://ustbhuangyi.github.io/better-scroll/doc/zh-hans/
 
@@ -94,7 +94,7 @@ Vue.use(VueLazyLoad, {
 
 官方地址: https://github.com/HenrikJoreteg/create-keyframe-animation
 
-##小技巧
+## 小技巧
 
 ### className
 

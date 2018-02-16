@@ -5,25 +5,31 @@
       <div class="list-wrapper" @click.stop>
         <div class="list-header">
           <h1 class="title">
-            <i class="icon"></i>
-            <span class="text"></span>
-            <span class="clear"><i class="icon-clear"></i></span>
+            <i class="icon" :class="iconMode" @click="changeMode"></i>
+            <span class="text">{{modeText}}</span>
+            <span class="clear" @click="showConfirm"><i class="icon-clear"></i></span>
           </h1>
         </div>
-        <div class="list-content">
-          <ul>
-            <li class="item">
-              <i class="current"></i>
-              <span class="text"></span>
+        <Scroll ref="listContent" :data="sequenceList" class="list-content">
+          <!--
+          可以将ul替换成transition-group
+          这是vue专为列表准备的动画
+          子元素li必须拥有key
+          需要在css中指定动画 name + -enter-active, name + -leave-active
+           -->
+          <transition-group name="list" tag="ul">
+            <li :key="item.id" ref="listItem" @click="selectItem(item, index)" class="item" v-for="(item, index) in sequenceList ">
+              <i :class="getCurrentIcon(item)" class="current"></i>
+              <span class="text">{{item.name}}</span>
               <span class="like">
                 <i class="icon-not-favorite"></i>
               </span>
-              <span class="delete">
+              <span @click.stop="deleteOne(item)" class="delete">
                 <i class="icon-delete"></i>
               </span>
             </li>
-          </ul>
-        </div>
+          </transition-group>
+        </Scroll>
         <div class="list-operate">
           <div class="add">
             <i class="icon-add"></i>
@@ -34,24 +40,88 @@
           <span @click="hide">关闭</span>
         </div>
       </div>
+      <Confirm ref="confirm" @confirm="confirmClear" text="是否清空播放列表" confirmBtnText="清空"></Confirm>
     </div>
   </transition>
 </template>
 
 <script type="text/ecmascript-6">
+  import {mapActions} from 'vuex'
+  import {playMode} from 'common/js/config'
+  import Scroll from 'base/scroll/scroll'
+  import Confirm from 'base/confirm/confirm'
+  import {playerMixin} from 'common/js/mixin'
+
   export default {
+    mixins: [playerMixin],
     data() {
       return {
         showFlag: false
       }
     },
+    computed: {
+      modeText() {
+        return this.mode === playMode.sequence ? '顺序播放' : this.mode === playMode.random ? '随机播放' : '单曲循环'
+      }
+    },
     methods: {
+      showConfirm() {
+        this.$refs.confirm.show()
+      },
+      confirmClear() {
+        this.deleteSongList()
+        this.hide()
+      },
+      selectItem(item, index) {
+        if (this.mode === playMode.random) {
+          index = this.playlist.findIndex(song => {
+            return song.id === item.id
+          })
+        }
+        this.setCurrentIndex(index)
+        this.setPlayingState(true)
+      },
       show() {
+        // 需要显示以后再初始化scroll组件
         this.showFlag = true
+        setTimeout(() => {
+          this.$refs.listContent.refresh()
+          this.scrollToCurrent(this.currentSong)
+        }, 20)
       },
       hide() {
         this.showFlag = false
+      },
+      getCurrentIcon(item) {
+        if (this.currentSong.id === item.id) {
+          return 'icon-play'
+        }
+        return ''
+      },
+      scrollToCurrent(current) { // 将列表滚动到当前歌曲
+        const index = this.sequenceList.findIndex(song => {
+          return current.id === song.id
+        })
+        this.$refs.listContent.scrollToElement(this.$refs.listItem[index], 300)
+      },
+      deleteOne(item) {
+        this.deleteSong(item)
+        if (!this.playlist.length) this.hide()
+      },
+      ...mapActions([
+        'deleteSong',
+        'deleteSongList'
+      ])
+    },
+    watch: {
+      currentSong(newSong, oldSong) {
+        if (!this.showFlag || newSong.id === oldSong.id) return
+        this.scrollToCurrent(newSong)
       }
+    },
+    components: {
+      Scroll,
+      Confirm
     }
   }
 </script>

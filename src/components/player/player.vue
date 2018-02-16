@@ -94,7 +94,7 @@
             <i @click.stop="togglePlaying" class="icon-mini" :class="miniIcon"></i>
           </progress-circle>
         </div>
-        <div class="control" @click="showPlaylist">
+        <div class="control" @click.stop="showPlaylist">
           <i class="icon-playlist"></i>
         </div>
       </div>
@@ -118,16 +118,17 @@
   import {prefixStyle} from 'common/js/dom'
   import ProgressBar from 'base/progress-bar/progress-bar'
   import ProgressCircle from 'base/progress-circle/progress-circle'
-  import {playMode} from 'common/js/config'
-  import {shuffle} from 'common/js/util'
   import Lyric from 'lyric-parser'
   import Scroll from 'base/scroll/scroll'
   import Playlist from 'components/playlist/playlist'
+  import {playerMixin} from 'common/js/mixin'
+  import {playMode} from 'common/js/config'
 
   const transform = prefixStyle('transform')
   const transitionDuration = prefixStyle('transitionDuration')
 
   export default {
+    mixins: [playerMixin],
     data() {
       return {
         songReady: false,
@@ -258,25 +259,6 @@
           this.currentLyric.seek(currentTime * 1000)
         }
       }, // onProgressBarChange
-      changeMode() {
-        // 三种状态,余3
-        const mode = (this.mode + 1) % 3
-        this.setPlayMode(mode)
-        let list = null
-        if (mode === playMode.random) {
-          list = shuffle(this.sequenceList)
-        } else {
-          list = this.sequenceList
-        }
-        this.resetCurrentIndex(list)
-        this.setPlayList(list)
-      }, // changeMode
-      resetCurrentIndex(list) { // 找出目前正在播放的歌曲
-        let index = list.findIndex(item => {
-          return item.id === this.currentSong.id
-        })
-        this.setCurrentIndex(index)
-      }, // resetCurrentIndex
       // 补零,n=2的意思是,n默认值为2
       _pad(num, n = 2) {
         let len = num.toString().length
@@ -299,11 +281,7 @@
         return {x, y, scale}
       }, // _getPosAndScale end
       ...mapMutations({
-        setFullScreen: 'SET_FULL_SCREEN',
-        setPlayingState: 'SET_PLAYING_STATE',
-        setCurrentIndex: 'SET_CURRENT_INDEX',
-        setPlayMode: 'SET_PLAY_MODE',
-        setPlayList: 'SET_PLAYLIST'
+        setFullScreen: 'SET_FULL_SCREEN'
       }),
       getLyric() {
         this.currentSong.getLyric().then(lyric => {
@@ -390,12 +368,6 @@
       playIcon() {
         return this.playing ? 'icon-pause' : 'icon-play'
       }, // playIcon end
-      iconMode() {
-        return this.mode === playMode.sequence
-          ? 'icon-sequence'
-          : this.mode === playMode.loop
-          ? 'icon-loop' : 'icon-random'
-      }, // iconMode
       miniIcon() {
         return this.playing ? 'icon-pause-mini' : 'icon-play-mini'
       }, // miniIcon end
@@ -406,17 +378,14 @@
         return this.currentTime / this.currentSong.duration
       }, // percent
       ...mapGetters([
-        'playlist',
         'fullScreen',
-        'currentSong',
         'playing',
-        'currentIndex',
-        'mode',
-        'sequenceList'
+        'currentIndex'
       ])
     }, // computed end
     watch: {
       currentSong(newVal, val) {
+        if (!newVal.id) return // 只有一首歌曲情况下,被删除时
         if (newVal.id === val.id) return // 在暂停时,切换播放模式时,不触发
         if (this.currentLyric) {
           this.currentLyric.stop() // lyric-parser的方法,清理内部的定时器,重新开始

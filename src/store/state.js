@@ -1,5 +1,5 @@
 import {playMode} from 'common/js/config'
-import {loadSearch} from 'common/js/catch'
+import {loadSearch} from 'common/js/cache'
 
 const state = {
   singer: {},
