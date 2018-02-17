@@ -59,7 +59,6 @@
     },
     created() {
       this._getHotKey()
-      console.log(this.searchHistory)
     },
     methods: {
       handlePlaylist(playlist) {
