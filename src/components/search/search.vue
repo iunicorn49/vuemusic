@@ -44,18 +44,17 @@
   import {getHotKey} from 'api/search'
   import {ERR_OK} from 'api/config'
   import Suggest from 'components/suggest/suggest'
-  import {mapActions, mapGetters} from 'vuex'
+  import {mapActions} from 'vuex'
   import SearchList from 'base/search-list/search-list'
   import Confirm from 'base/confirm/confirm'
   import Scroll from 'base/scroll/scroll'
-  import {playlistMixin} from 'common/js/mixin'
+  import {playlistMixin, searchMixin} from 'common/js/mixin'
 
   export default {
-    mixins: [playlistMixin],
+    mixins: [playlistMixin, searchMixin],
     data() {
       return {
-        hotKey: [],
-        query: '' // 给suggest用
+        hotKey: []
       }
     },
     created() {
@@ -73,24 +72,11 @@
       showConfrim() {
         this.$refs.confirm.show()
       },
-      deleteAll() {
-        this.clearSearchHistory()
-      },
       deleteOne(item) {
         this.deleteSearchHistory(item)
       },
-      saveSearch() { // 保存搜索历史
-        this.saveSearchHistory(this.query)
-      },
-      onQueryChange(query) {
-        this.query = query
-      },
-      addQuery(query) {
-        /**
-         * 获取SearchBox的引用
-         * 直接调用它的方法,将query传递进去
-         */
-        this.$refs.searchBox.setQuery(query)
+      deleteAll() {
+        this.clearSearchHistory()
       },
       _getHotKey() {
         getHotKey().then(res => {
@@ -99,22 +85,14 @@
           }
         })
       }, // _getHotKey
-      blurInput() {
-        this.$refs.searchBox.blur() // 调用子组件的方法
-      },
       ...mapActions([
-        'saveSearchHistory',
-        'deleteSearchHistory',
         'clearSearchHistory'
       ])
     },
     computed: {
       shortcut() { // 由于scoll组件中产生了两部分数据,所以,结合两个数据传入scroll组件
         return this.hotKey.concat(this.searchHistory)
-      },
-      ...mapGetters([
-        'searchHistory'
-      ])
+      }
     },
     watch: {
       query(newQ) {

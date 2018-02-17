@@ -14,7 +14,7 @@ Element.getBoundingClientRect()
 
 ### -S
 
-####nbabel-runtime
+#### nbabel-runtime
 
 对 ES 语法进行转译
 
@@ -83,9 +83,9 @@ Vue.use(VueLazyLoad, {
 <template>
   <div>
     <!-- 引用插件前 -->
-	<img :src="item.imgurl">
-	<!-- 引用插件后 -->
-	<img v-lazy="item.imgurl">
+	  <img :src="item.imgurl">
+	  <!-- 引用插件后 -->
+	  <img v-lazy="item.imgurl">
   </div>
 </template>
 ```
@@ -98,7 +98,7 @@ Vue.use(VueLazyLoad, {
 
 ### className
 
-> 可以获取目标 DOM 元素的 class , 返回一个字符串, 可以添加 class . 
+> 可以获取目标 DOM 元素的 class , 返回一个字符串, 可以添加 class .
 
 ```javascript
 let box = document.getElementById('box')

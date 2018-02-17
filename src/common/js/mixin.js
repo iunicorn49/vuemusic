@@ -1,5 +1,5 @@
 // Mixin 就是 组件公用的代码
-import {mapGetters, mapMutations} from 'vuex'
+import {mapGetters, mapMutations, mapActions} from 'vuex'
 import {playMode} from 'common/js/config'
 import {shuffle} from 'common/js/util'
 
@@ -68,5 +68,40 @@ export const playerMixin = {
       })
       this.setCurrentIndex(index)
     } // resetCurrentIndex
+  }
+}
+
+export const searchMixin = {
+  data() {
+    return {
+      query: ''
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'searchHistory'
+    ])
+  },
+  methods: {
+    saveSearch() { // 保存搜索历史
+      this.saveSearchHistory(this.query)
+    },
+    blurInput() {
+      this.$refs.searchBox.blur() // 调用子组件的方法
+    },
+    onQueryChange(query) {
+      this.query = query
+    },
+    addQuery(query) {
+      /**
+       * 获取SearchBox的引用
+       * 直接调用它的方法,将query传递进去
+       */
+      this.$refs.searchBox.setQuery(query)
+    },
+    ...mapActions([
+      'deleteSearchHistory',
+      'saveSearchHistory'
+    ])
   }
 }
