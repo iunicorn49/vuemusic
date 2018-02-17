@@ -13,10 +13,28 @@
       </div>
       <div class="shortcut" v-show="!query">
         <Switches @switch="switchItem" :switches="switches" :currentIndex="currentIndex"></Switches>
+        <div class="list-wrapper">
+          <Scroll ref="songList" class="list-scroll" :data="playHistory" v-if="currentIndex === 0">
+            <div class="list-inner">
+              <SongList @select="selectSong" :songs="playHistory"></SongList>
+            </div>
+          </Scroll>
+          <Scroll :refreshDelay="refreshDelay" ref="searchList" :data="searchHistory" class="list-scroll" v-if="currentIndex === 1">
+            <div class="list-inner">
+              <search-list :searches="searchHistory" @delete="deleteSearchHistory" @select="addQuery"></search-list>
+            </div>
+          </Scroll>
+        </div>
       </div>
       <div class="search-result" v-show="query">
         <Suggest @listScroll="blurInput" @select="selectSuggest" :showSinger="showSinger" :query="query"></Suggest>
       </div>
+      <top-tip ref="topTip">
+        <div class="tip-title">
+          <i class="icon-ok"></i>
+          <span class="text">1首歌曲已经添加到播放队列</span>
+        </div>
+      </top-tip>
     </div>
   </transition>
 </template>
@@ -26,6 +44,12 @@
   import Suggest from 'components/suggest/suggest'
   import {searchMixin} from 'common/js/mixin'
   import Switches from 'base/switches/switches'
+  import Scroll from 'base/scroll/scroll'
+  import {mapGetters, mapActions} from 'vuex'
+  import SongList from 'base/song-list/song-list'
+  import Song from 'common/js/song'
+  import SearchList from 'base/search-list/search-list'
+  import TopTip from 'base/top-tip/top-tip'
 
   export default {
     mixins: [searchMixin],
@@ -40,24 +64,59 @@
         ]
       }
     },
+    computed: {
+      ...mapGetters([
+        'playHistory'
+      ])
+    },
     methods: {
+      selectSong(song, index) {
+        /**
+         * 这边是从缓存中取出来的列表,里面的song不是我们自己定义的songClass的实例
+         */
+        if (index !== 0) {
+          this.insertSong(new Song(song))
+          this.showTip()
+        }
+      },
       switchItem(index) {
         this.currentIndex = index
       },
       selectSuggest() {
         this.saveSearch()
+        this.showTip()
       },
       show() {
         this.showFlag = true
+        /**
+         * 需要等到scroll的display变成block以后,再初始化,否则高度不准确
+         */
+        setTimeout(() => {
+          if (this.currentIndex === 0) {
+            this.$refs.songList.refresh()
+          } else {
+            this.$refs.searchList.refresh()
+          }
+        }, 20)
       },
       hide() {
         this.showFlag = false
-      }
+      },
+      showTip() {
+        this.$refs.topTip.show()
+      },
+      ...mapActions([
+        'insertSong'
+      ])
     },
     components: {
       SearchBox,
       Suggest,
-      Switches
+      Switches,
+      Scroll,
+      SongList,
+      SearchList,
+      TopTip
     }
   }
 </script>

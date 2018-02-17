@@ -14,7 +14,10 @@
       data: {type: Array, default: null}, // 外部传入的数据, 用于决定组件的宽高
       listenScroll: {type: Boolean, default: false}, // 是否监听滚动坐标
       pullup: {type: Boolean, default: false}, // 上拉刷新
-      beforeScroll: {type: Boolean, default: false} // 滚动时,让input失去焦点,可以让键盘收起来
+      beforeScroll: {type: Boolean, default: false}, // 滚动时,让input失去焦点,可以让键盘收起来
+      // 当scroll组件内部组件有动画过渡时,会有100多毫秒的动画时间,如果只延迟20毫秒来重新获取高度是不行的
+      // 所以,需要加一个配置项
+      refreshDelay: {type: Number, default: 20}
     },
     mounted() {
       setTimeout(() => {
@@ -72,7 +75,7 @@
       data() {
         setTimeout(() => {
           this.refresh()
-        }, 20)
+        }, this.refreshDelay)
       }
     }
   }

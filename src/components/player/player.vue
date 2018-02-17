@@ -113,7 +113,7 @@
 </template>
 
 <script type="text/ecmascript-6">
-  import {mapGetters, mapMutations} from 'vuex'
+  import {mapGetters, mapMutations, mapActions} from 'vuex'
   import animations from 'create-keyframe-animation'
   import {prefixStyle} from 'common/js/dom'
   import ProgressBar from 'base/progress-bar/progress-bar'
@@ -144,6 +144,9 @@
       this.touch = {} // 用来存放左右滑动的参数,不需要进行数据绑定,所以不用添加到data中
     },
     methods: {
+      ...mapActions([
+        'savePlayHistory'
+      ]),
       showPlaylist() {
         this.$refs.playlist.show()
       },
@@ -238,7 +241,10 @@
         this.$refs.cdWrapper.transition = ''
         this.$refs.cdWrapper.style[transform] = ''
       }, // afterLeave end
-      ready() { this.songReady = true }, // ready
+      ready() {
+        this.songReady = true
+        this.savePlayHistory(this.currentSong)
+      }, // ready
       error() { this.songReady = true }, // error
       updateTime(e) {
         // e.target.currentTime:返回多媒体的播放位置,秒为单位

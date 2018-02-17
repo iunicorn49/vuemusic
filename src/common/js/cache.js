@@ -4,8 +4,10 @@ import storage from 'good-storage'
  * 需求决定,最多保存15条记录,最新的记录出现在第一条
  * 如果有重复的数据,就把旧的删除,将新的插入到最前面
  */
-const SEARCH_KEY = '__search__' // 存储的key
+const SEARCH_KEY = '__search__' // 搜索历史,key
 const SEARCH_MAX_LENGTH = 15 // 最多存储条数
+const PLAY_KEY = '__play__' // 播放历史,key
+const PLAY_MAX_LENGTH = 200
 
 /**
  * 将插入元素单独封装
@@ -67,4 +69,20 @@ export function deleteSearch(query) {
 export function clearSearch() {
   storage.remove(SEARCH_KEY)
   return []
+}
+
+/**
+ * 存储播放历史
+ */
+export function savePlay(song) { // 写入
+  let songs = storage.get(PLAY_KEY, [])
+  insertArray(songs, song, item => {
+    return item.id === song.id
+  }, PLAY_MAX_LENGTH)
+  storage.set(PLAY_KEY, songs)
+  return songs
+}
+
+export function loadPlay() { // 读取
+  return storage.get(PLAY_KEY, [])
 }

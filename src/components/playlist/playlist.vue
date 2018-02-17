@@ -10,12 +10,14 @@
             <span class="clear" @click="showConfirm"><i class="icon-clear"></i></span>
           </h1>
         </div>
-        <Scroll ref="listContent" :data="sequenceList" class="list-content">
+        <Scroll ref="listContent" :refreshDelay="refreshDelay" :data="sequenceList" class="list-content">
           <!--
           可以将ul替换成transition-group
           这是vue专为列表准备的动画
           子元素li必须拥有key
           需要在css中指定动画 name + -enter-active, name + -leave-active
+          这边当数据变化时,有一个100多毫秒的动画效果,但是,scroll20毫秒的时候就已经刷新了
+          这样会导致scroll组件获取高度错误,结局方法,就是延迟刷新的时间
            -->
           <transition-group name="list" tag="ul">
             <li :key="item.id" ref="listItem" @click="selectItem(item, index)" class="item" v-for="(item, index) in sequenceList ">
@@ -58,7 +60,8 @@
     mixins: [playerMixin],
     data() {
       return {
-        showFlag: false
+        showFlag: false,
+        refreshDelay: 100
       }
     },
     computed: {
