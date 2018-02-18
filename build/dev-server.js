@@ -50,7 +50,7 @@ apiRoutes.get('/lyric', function (req, res) {
     params: req.query
   }).then((response) => {
     var ret = response.data
-    if(typeof ret === 'string') {
+    if (typeof ret === 'string') {
       var reg = /^\w+\(({[^()]+})\)$/ // 可以捕获jsonp的callback中的字符串
       var matches = ret.match(reg)
       if (matches) {

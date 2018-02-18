@@ -131,7 +131,50 @@ console.log(box.className)
 
 参数传入字符串或者正则, 用来匹配参数中的内容, 返回布尔值(不确定).
 
-## Vuex
+## 编译打包
 
-官方文档: https://vuex.vuejs.org/zh-cn/
+执行命令
 
+```bash
+npm run build
+```
+
+> 这条命令, 执行的是, **package.json** 下的 **scripts** 中的 **build** . 对应 `node build/build.js` 这个文件.
+
+打包完成后
+
+![5E90A825-9248-47FB-A651-5CF4079A8A00](README_IMG/5E90A825-9248-47FB-A651-5CF4079A8A00.png)
+
+文件格式名称前面的是哈希值.
+
+我们可以对 `static/js/app.js` 进行优化.
+
+`static/js/vendor.js` 这个里面是npm包, 只要不修改依赖包, 即便改了代码, 这个哈希值也是不变的.
+
+### 路由懒加载
+
+```javascript
+const Recommend = resolve => {
+  import('components/recommend/recommend').then(module => {
+    resolve(module)
+  })
+}
+```
+
+![34B6FD90-C9CB-47DC-9069-205DAC16767B](README_IMG/34B6FD90-C9CB-47DC-9069-205DAC16767B.png)
+
+> 打包完会多出很多文件, 但是首屏需要的 **app.js** 小了很多.
+
+## 调试和抓包
+
+### vConsole
+
+官方文档: https://github.com/Tencent/vConsole/blob/dev/README_CN.md
+
+> 微信前端团队出品, 直接改写了 **JS** 中 `console.log` 这个方法, 可以在移动端使用控制台.
+
+### Charles
+
+> Mac独有, 抓包工具.
+>
+> https的请求是抓不到的, 需要配置证书来抓.
