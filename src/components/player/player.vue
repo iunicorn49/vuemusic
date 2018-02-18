@@ -100,10 +100,10 @@
       </div>
     </transition>
     <Playlist ref="playlist"></Playlist>
-    <!-- canplay:当这个标签准备好了之后触发
+    <!-- canplay:当这个标签准备好了之后触发,这边选择play事件,请参考H5官方文档
          error:当url有问题时以及出现网络问题时触发
          timpeupdate:播放进度改变时触发 -->
-    <audio @canplay="ready"
+    <audio @play="ready"
            @error="error"
            @timeupdate="updateTime"
            @ended="end"
@@ -180,6 +180,7 @@
         if (!this.songReady) return
         if (this.playlist.length === 1) { // 当列表只有一首歌的时候
           this.loop()
+          return // 避免切歌不播放的问题,原因就是进入这个分支时,不用触发this.songReady = false
         } else {
           let index = this.currentIndex + 1
           if (index === this.playlist.length) index = 0
@@ -192,6 +193,7 @@
         if (!this.songReady) return
         if (this.playlist.length === 1) { // 当列表只有一首歌的时候
           this.loop()
+          return
         } else {
           let index = this.currentIndex - 1
           if (index === -1) index = this.playlist.length - 1
@@ -291,6 +293,7 @@
       }),
       getLyric() {
         this.currentSong.getLyric().then(lyric => {
+          if (this.currentSong.lyric !== lyric) return // 解决快速切换歌曲,歌词不同步的bug
           this.currentLyric = new Lyric(lyric, this.handleLyric)
           if (this.playing) {
             this.currentLyric.play()
@@ -337,7 +340,7 @@
         this.$refs.middleL.style.opacity = 1 - this.touch.percent // 随着屏幕滑动可以淡入淡出
         this.$refs.middleL.style[transitionDuration] = 0
       }, // middleTouchMove
-      middleTouchEnd(e) {
+      middleTouchEnd() {
         let offsetWidth = 0 // 偏移量
         let opacity = 0
         if (this.currentShow === 'cd') { // 从右向左滑
@@ -396,7 +399,8 @@
         if (this.currentLyric) {
           this.currentLyric.stop() // lyric-parser的方法,清理内部的定时器,重新开始
         }
-        setTimeout(() => { // 手机浏览器在后台是不执行js代码的,这个定时器可以保证,从后台切换前台时,里面的东西依然在播放,原理未知
+        clearTimeout(this.timer) // 边界清空,当用户在一秒内快速切换歌曲
+        this.timer = setTimeout(() => { // 手机浏览器在后台是不执行js代码的,这个定时器可以保证,从后台切换前台时,里面的东西依然在播放,原理未知
           this.$refs.audio.play()
           this.getLyric()
         }, 1000)
