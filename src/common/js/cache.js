@@ -8,6 +8,8 @@ const SEARCH_KEY = '__search__' // 搜索历史,key
 const SEARCH_MAX_LENGTH = 15 // 最多存储条数
 const PLAY_KEY = '__play__' // 播放历史,key
 const PLAY_MAX_LENGTH = 200
+const FAVORITE_KEY = '__favorite__' // 收藏,key
+const FAVORITE_MAX_LENGTH = 200
 
 /**
  * 将插入元素单独封装
@@ -85,4 +87,29 @@ export function savePlay(song) { // 写入
 
 export function loadPlay() { // 读取
   return storage.get(PLAY_KEY, [])
+}
+
+/**
+ ** 收藏
+ */
+export function saveFavorite(song) {
+  let songs = storage.get(FAVORITE_KEY, [])
+  insertArray(songs, song, item => {
+    return item.id === song.id
+  }, FAVORITE_MAX_LENGTH)
+  storage.set(FAVORITE_KEY, songs)
+  return songs
+}
+
+export function deleteFaorite(song) {
+  let songs = storage.get(FAVORITE_KEY, [])
+  deleteFromArray(songs, item => {
+    return item.id === song.id
+  })
+  storage.set(FAVORITE_KEY, songs)
+  return songs
+}
+
+export function loadFavorite() {
+  return storage.get(FAVORITE_KEY, [])
 }
